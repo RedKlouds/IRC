@@ -10,6 +10,10 @@ import java.awt.GridLayout;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
@@ -47,7 +51,9 @@ import javax.swing.text.DefaultCaret;
  * There will  be methods however to allow interfacing with the 
  * panels inorder to display text to them
  * 
- * 
+ * Problems:
+ * 	make sure nick name checking
+ * 	JScrollPanel needs to find soluton to scroll back up freely
  * 
  * 
  ***************************************************************/
@@ -55,14 +61,17 @@ import javax.swing.text.DefaultCaret;
 public class UserInterface extends JFrame{
 	//get the user computer name to used as a display for the top of the jFrame
 	protected String clientComputerName = System.getProperty("user.name");
+	private JTextArea terminalDisp;
 	
 	private String dir = System.getProperty("user.dir");
 	
 	public UserInterface(){
+		//instatiate the main outup tot he user interface
+		terminalDisp = new JTextArea();
 		//set up this window properties
 		adjustWindowProperties();
 		//gather the required panels to add into the main panels
-		JPanel terminalPanel = makeTerminalPanel();
+		JPanel terminalPanel = makeTerminalPanel(terminalDisp);
 		JPanel controlPanel = makeControlPanel();
 		JPanel bottomPanel = makeBottomPanel();
 		JMenuBar menuBar = makeMenuBar();
@@ -102,7 +111,7 @@ public class UserInterface extends JFrame{
 	 * 	->
 	 * 	->
 	 **************************************************************************/
-	private JPanel makeTerminalPanel(){
+	private JPanel makeTerminalPanel(JTextArea terminalMsgDisplay){
 		JPanel terminalPanel = new JPanel();
 		//set the layout manager for the terminal panel
 		terminalPanel.setLayout(new GridLayout());
@@ -112,37 +121,38 @@ public class UserInterface extends JFrame{
 		terminalPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLoweredBevelBorder(),"Terminal Channel Chat"));
 		//put a nice border around our terminal panel, and some title text
 		
-		
-		JTextArea terminalMsgDisplay = new JTextArea();
+		//terminalMsgDisplay = new JTextArea();
 		//new InputThread(this.IRCObject, terminalMsgDisplay).start(); //made a thread here and attached it to the textArea to output
 		
-		DefaultCaret caret = (DefaultCaret)terminalMsgDisplay.getCaret();//auto scroll policy needs to make changes
+		DefaultCaret caret = (DefaultCaret)terminalMsgDisplay.getCaret();
+		//auto scroll policy needs to make changes
 		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 		
 		terminalMsgDisplay.setCaretPosition(terminalMsgDisplay.getDocument().getLength());
-		
 		//IRCObject.setIncommingMsg(terminalMsgDisplay); send messages to the jtextArea
-		//add the scrooll pane
-		JScrollPane terminalScrollPane = new JScrollPane(terminalMsgDisplay);//this is how you use a JScroll Pane DO not USE .add just throw in your text field into the constructor and let everything do the rest
-		
+		//add the scroll pane
+		JScrollPane terminalScrollPane = new JScrollPane(terminalMsgDisplay);
+		//this is how you use a JScroll Pane DO not USE .add just throw in your text field into the constructor and let everything do the rest
 		terminalScrollPane.setMaximumSize(new Dimension(100, 400));
 	
-		// makes instance of scroll Pane for our terminals text to be placed into
-	
-	
-		
-	
-		
-
-		
+		// makes instance of scroll Pane for our terminals text to be placed int
 		//terminalMsgDisplay.append("This is Where text will be displayed from Using input and output Threads ");
-		
 		terminalMsgDisplay.setLineWrap(true);
 		terminalMsgDisplay.setWrapStyleWord(true);
-
+		//add the terminal scrolling panel to the terminal panel
 		terminalPanel.add(terminalScrollPane);
-		
-		//getContentPane().add(terminalPanel);
+		//add the listener for when a values is changed in the scroll pane , it will update
+		//the scroll panel bar, to the lowest/maximum location
+		terminalScrollPane.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
+			@Override
+			public void adjustmentValueChanged(AdjustmentEvent arg0) {
+				// TODO Auto-generated method stub
+				arg0.getAdjustable().setValue(arg0.getAdjustable().getMaximum());  
+			}
+	    });
+		for ( int i =0; i < 100; i ++){
+			terminalMsgDisplay.append("hellow " + i);
+		}
 		
 		return terminalPanel;
 		
@@ -160,10 +170,11 @@ public class UserInterface extends JFrame{
 	 */
 	
 	/**************************************************************************
-	 * Function: 
+	 * Function: makeControl panel
 	 *  
 	 * Description:
-	 * 	->
+	 * 	-> This panel handles displaying the links for facebook, github and 
+	 * linkdin, 
 	 * ASSUMPTIONS:
 	 * 	-> None
 	 * PRECONDITIONS:
@@ -174,224 +185,80 @@ public class UserInterface extends JFrame{
 	 * 	->
 	 **************************************************************************/
 	private JPanel makeControlPanel(){
-		//controlPanel
 		
-				JPanel rightPane = createAndSetJPanel(new BorderLayout(), 250, 240);
-				
-				
-				//JPanel controlPanel = new JPanel(new BorderLayout());
-				JPanel controlPanel = createAndSetJPanel(new BorderLayout(), 250, 240);
-				//sets a border for the JPanel
-				setBorderOnPanel(controlPanel, "Control Panel");
-				
-				
-				JPanel controlPanelButton = createAndSetJPanel(new GridLayout(0,2,5,5), 50, 50);
+		JPanel rightPane = createAndSetJPanel(new BorderLayout(), 250, 240);
+		//panel for the control panel
+		
+		JPanel controlPanel = createAndSetJPanel(new BorderLayout(), 250, 240);
+		//sets a border for the JPanel
+		setBorderOnPanel(controlPanel, "Control Panel");
+			
+		JPanel controlPanelButton = createAndSetJPanel(new GridLayout(0,2,5,5), 50, 50);
+		
+	
 
-				
-				
-				/******************************************************
-				 * Idea:
-				 * make seperate instances of a channel, and point thier output to the textfield
-				 * keep making different instances and have them connected  to the Jtextfield
-				 * 
-				 * 
-				 * 
-				 */
-				
-				
-				
-				
-				
-				
-				
-				//JPanel controlPanelButton = new JPanel(new GridLayout(0,2,5,5));
-				
-				//controlPanelButton.setPreferredSize(new Dimension(50, 50));
-				//controlPanel.setLayout(new GridLayout(3,3,10,30));
+		JPanel botLink = new JPanel(new FlowLayout(FlowLayout.RIGHT,3,3));
+		
+		JButton[] setButton = createCustomJButton(new ImageIcon[] {
+				new ImageIcon(dir + "\\test1.gif","Check out my GitHub!"),
+				new ImageIcon(dir + "\\linkdin.png","want to connect? :D")
+				} , botLink);
 
-				
-				
-				
-				HashMap hashmap = new HashMap<String, nodeTest<String>>();
-				ArrayList<nodeTest> list = new ArrayList<nodeTest>();
-				//DefaultListModel listModel = new DefaultListModel(hashmap); // this extends list, basically a list structure
-
-				
-				
-				//hashmap.put();
-				
-				//Hashtable<String, Object> table = new Hashtable<String,Object>();
-
-				//JPanel channelListpane = new JPanel();
-				
-				DefaultListModel<nodeTest> list1 = new DefaultListModel<nodeTest>();
-				for(int i =0; i < 5; i++){
-					nodeTest temp = new nodeTest<String>();
-					list1.addElement(temp);
+		
+		setButton[0].addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				try{
+					Desktop.getDesktop().browse(new URI("https://github.com/redklouds"));
+				}catch(Exception q){
+					q.printStackTrace();
 				}
-				
-				JList ChannelList = new JList(list1); // this class uses generics to have a type for the items within a data structure
-				ChannelList.setLayoutOrientation(JList.VERTICAL);
-				ChannelList.setPreferredSize(new Dimension(130,5));
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				JButton[] controlButton = setLabelOnButton(new String[]{"Add Chan","Remove Chan","Button 1", "Button 2"}, controlPanelButton);
-
-				
-				controlButton[0].addActionListener(new ActionListener() {
-					
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						// TODO Auto-generated method stub
-						String temp = JOptionPane.showInputDialog("Input some message/Channel to join");
-						
-						list1.addElement(new nodeTest(temp));
-						/*
-						for(int i =0; i < 20; i++){
-							tet.addElement("Blah " + i * Math.random()*5);
-						}
-						tet.addElement(temp);
-						
-					*/
-					}
-					
-				});
-
-				controlButton[1].addActionListener(new ActionListener() {
-					
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						// TODO Auto-generated method stub
-						int index = ChannelList.getSelectedIndex();
-						if(index <0){
-							JOptionPane.showMessageDialog(null, "No items selected, please seletec a channel");
-						}else{
-							list1.remove(index);
-							System.out.println(index);
-							//getSelectedIndecies will return an int[] with multiple indexes seleteced
-						}
-					}
-				});
-
-				
-				
-				//JPanel blankPan = new JPanel();
-				
-				JScrollPane listScroll = new JScrollPane(ChannelList);
-				
-				listScroll.setPreferredSize(new Dimension(140,100)); //wideX hiegth of the JList size
-
-				
-				
-				
-				JPanel channelDisplay = new JPanel(new BorderLayout());
-				
-
-
-				channelDisplay.add(new JLabel("Channel Listing:"), BorderLayout.PAGE_START);
-				channelDisplay.add(listScroll, BorderLayout.LINE_END);
-
-				
-				
-				
-				
-				
-				
-				
-
-
-				//icons must be sized gif/png .. etc 16x16, 32x32, 64x64x 128x128
-
-
-				
-				JPanel botLink = new JPanel(new FlowLayout(FlowLayout.RIGHT,3,3));
-				
-				JButton[] setButton = createCustomJButton(new ImageIcon[] {new ImageIcon(dir + "\\test1.gif","Check out my GitHub!"),new ImageIcon(dir + "\\test.png","Want to see amazing projects, check this guy out!"),new ImageIcon(dir + "\\linkdin.png","want to connect? :D")} , botLink);
-
-				
-				setButton[0].addActionListener(new ActionListener() {
-					
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						// TODO Auto-generated method stub
-						try{
-							Desktop.getDesktop().browse(new URI("https://github.com/damugen123"));
-						}catch(Exception q){
-							q.printStackTrace();
-						}
-					}
-				});
-				
-				setButton[1].addActionListener(new ActionListener() {
-					
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						try{
-							Desktop.getDesktop().browse(new URI("https://github.com/Maome"));
-						}catch(Exception qq){
-							qq.printStackTrace();
-						}
-					}
-				});
-				
-				
-				setButton[2].addActionListener(new ActionListener() {
-					
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						try{
-							Desktop.getDesktop().browse(new URI("www.linkedin.com/in/dannyly0/"));
-						}catch(Exception qq){
-							qq.printStackTrace();
-						}
-					}
-				});
-				
-				
-				//controlPanel.add(new JLabel("test"),BorderLayout.LINE_END);
-
-				//controlPanel.add(botLink, BorderLayout.SOUTH);
+			}
+		});
+		
+		
+		setButton[1].addActionListener(new ActionListener() {
 			
-				
-				controlPanel.add(controlPanelButton, BorderLayout.NORTH);
-				
-				controlPanel.add(channelDisplay, BorderLayout.CENTER);
-			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try{
+					Desktop.getDesktop().browse(new URI("www.linkedin.com/in/dannyly0/"));
+				}catch(Exception qq){
+					qq.printStackTrace();
+				}
+			}
+		});
 
-				
-				rightPane.add(controlPanel,BorderLayout.PAGE_START);
-				
-				rightPane.add(botLink,BorderLayout.PAGE_END);
-				
-				//controlPanel.add(topInformationPanel,BorderLayout.NORTH);
-				//getContentPane().add(controlPanel, BorderLayout.LINE_END);
-				
-				
-				getContentPane().add(rightPane, BorderLayout.LINE_END);
-			return rightPane;
+		controlPanel.add(controlPanelButton, BorderLayout.NORTH);
+		
+	
+		
+		rightPane.add(controlPanel,BorderLayout.PAGE_START);
+		
+		rightPane.add(botLink,BorderLayout.PAGE_END);
+		
+		//controlPanel.add(topInformationPanel,BorderLayout.NORTH);
+		//getContentPane().add(controlPanel, BorderLayout.LINE_END);
+		
+		
+		getContentPane().add(rightPane, BorderLayout.LINE_END);
+	return rightPane;
 				
 	}
 	/**************************************************************************
-	 * Function: 
+	 * Function: adjustWindowProperties
 	 *  
 	 * Description:
-	 * 	->
+	 * 	-> Adjust the window properties of the inital ContentPane
 	 * ASSUMPTIONS:
 	 * 	-> None
 	 * PRECONDITIONS:
 	 * 	-> None
 	 * 	-> None
 	 * POSTCONDITIONS:
-	 * 	->
+	 * 	-> settings for ContenPane are set
 	 * 	->
 	 **************************************************************************/
 	private void adjustWindowProperties(){
@@ -405,12 +272,8 @@ public class UserInterface extends JFrame{
 
 		getContentPane().setLayout(new BorderLayout(10,15));
 	}
-	/*
-	 * Function MakeBottom Panel
-	 * Description: makes the panel that is responsible for inputting user 
-	 * text and sending it to the chat service, also features a clear all
-	 * button to clear the chat history/ on going chat logs
-	 */
+	
+	
 	/**************************************************************************
 	 * Function: 
 	 *  
@@ -511,16 +374,10 @@ public class UserInterface extends JFrame{
 		//set bottom message text area
 		JPanel sendMessagePanel = new JPanel(new BorderLayout());
 		
-		
 		JPanel textFramPanel = new JPanel(new GridLayout(1,1));
-		
-
-		
-
 		JTextField sendMsgField = new JTextField("Enter your message to send here");
 		JScrollPane scroll = new JScrollPane(sendMsgField);
 	
-		
 		sendMsgField.setColumns(18); // sets a length fro this box
 		textFramPanel.add(sendMsgField);
 
@@ -529,22 +386,37 @@ public class UserInterface extends JFrame{
 		JPanel msgButtPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		JButton[] messagePanelButtonArr= setLabelOnButton(new String[]{"Clear Chat"}, msgButtPanel);
 
+		messagePanelButtonArr[0].addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				terminalDisp.setText("");
+				
+			}
+		});
+		
 		//setBorderOnPanel(sendMessagePanel, "Input of Message:");
 		
 		sendMessagePanel.add(msgButtPanel, BorderLayout.LINE_END);
-		
-		
 
-		
 		sendMsgField.setBorder(BorderFactory.createTitledBorder(
 				BorderFactory.createLoweredBevelBorder(),
 				"Input Messages here") );
 		
+		sendMsgField.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				//each time an action has been performaed IE a enter
+				//we take the string that was used, send it to the server
+				//reset the field/clear the field
+				System.out.println("INFO: " + sendMsgField.getText());
+				//UserInterface.sendMsgToTerminal(sendMsgField.getText());
+				sendMsgField.setText("");
+			}
+		});
 		
-		
-		
-		
-		getContentPane().add(sendMessagePanel, BorderLayout.PAGE_END);
+		//getContentPane().add(sendMessagePanel, BorderLayout.PAGE_END);
 		return sendMessagePanel;
 		
 	}
@@ -770,10 +642,71 @@ public class UserInterface extends JFrame{
 	 * 	->
 	 * 	->
 	 **************************************************************************/
+	public void sendMsgToTerminal(String msg){
+		this.terminalDisp.append("Test: " + msg);
+	}
 	public static void main(String[] args){
 		UserInterface ui = new UserInterface();
+		for(int i =0; i <500; i++){
+			ui.sendMsgToTerminal(i + "from main yolo\n");
+		}
 		
 	}
-
 }
+/*
+class Output extends Thread{
+	//output to the chat log
+	private BufferedReader br;
+	public Output(){
+		this(null);
+	}
+	public Output(BufferedReader s){
+		this.br = s;
+	}
+	public void run(){
+		String line;
+		try {
+			while((line = this.br.readLine()) != null){
+				System.out.println(line);
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+}
+
+
+
+class InputL extends Thread {
+	
+	Scanner scanner;
+	String readString;
+	String _channel_name;
+	PrintStream printS;
+	public InputL(PrintStream ps, String _channel_name){
+		this.scanner = new Scanner(System.in);
+		this.printS = ps;
+		this._channel_name = _channel_name;
+		
+	}
+	public void run(){
+		
+		readString = scanner.nextLine();
+		while(this.readString != null){
+			//given the input stream ,  then print to the stream
+			System.out.printf("[+] printing  message to the stream %s: ", readString);
+			printS.println("PRIVMSG " + " " + this._channel_name + " :" + readString);
+			//read from the input stream
+			//System.out.println(readString);
+			if(scanner.hasNextLine()){
+				readString = scanner.nextLine();
+			}else{
+				readString = null;
+				
+			}
+		}		
+	}
+}
+*/
 
