@@ -59,21 +59,31 @@ import javax.swing.text.DefaultCaret;
  ***************************************************************/
 
 public class UserInterface extends JFrame{
+	
+	
+	//Singleton, meaning only a single instance of this object may exist
+	
+	private static UserInterface _userinterface = null;
 	//get the user computer name to used as a display for the top of the jFrame
 	protected String clientComputerName = System.getProperty("user.name");
+	//terminalDisplay and inputMessageField are out two connections to interfaces
+	//that want to display or input data to our UI
 	private JTextArea terminalDisp;
-	
+	private JTextField inputMessageField;
+
+	//used asthetic to show computer name at top of UI client
 	private String dir = System.getProperty("user.dir");
 	
-	public UserInterface(){
+	protected UserInterface(){
 		//instatiate the main outup tot he user interface
 		terminalDisp = new JTextArea();
+		inputMessageField = new JTextField("Enter your message to send here");
 		//set up this window properties
 		adjustWindowProperties();
 		//gather the required panels to add into the main panels
 		JPanel terminalPanel = makeTerminalPanel(terminalDisp);
 		JPanel controlPanel = makeControlPanel();
-		JPanel bottomPanel = makeBottomPanel();
+		JPanel bottomPanel = makeBottomPanel(inputMessageField);
 		JMenuBar menuBar = makeMenuBar();
 		
 		//add all the sub panels to the main panel
@@ -93,8 +103,17 @@ public class UserInterface extends JFrame{
 		setVisible(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
-		
+	public static UserInterface getInstance(){
+		//place where the object will be returned, and only one 
+		//will exising because of the following code
+		if(_userinterface == null){
+			//prevent to instantiate more than just the one
+			_userinterface = new UserInterface();
+		}
+		return _userinterface;
+	}
 	
+
 	/**************************************************************************
 	 * Function: MakeTerminalPanel
 	 *  
@@ -150,25 +169,12 @@ public class UserInterface extends JFrame{
 				arg0.getAdjustable().setValue(arg0.getAdjustable().getMaximum());  
 			}
 	    });
-		for ( int i =0; i < 100; i ++){
-			terminalMsgDisplay.append("hellow " + i);
-		}
+	
 		
 		return terminalPanel;
 		
 	}
-	/**********************************************************************
-	 * Function makeControlPanel
-	 * Desciptions: uses group layout to group the right most control
-	 * panel of thje User interface this includes the following:
-	 * 	-> github links
-	 * 	->facebook Links
-	 * 	->websitelinks
-	 * 
-	 * 
-	 * 
-	 */
-	
+
 	/**************************************************************************
 	 * Function: makeControl panel
 	 *  
@@ -195,7 +201,6 @@ public class UserInterface extends JFrame{
 			
 		JPanel controlPanelButton = createAndSetJPanel(new GridLayout(0,2,5,5), 50, 50);
 		
-	
 
 		JPanel botLink = new JPanel(new FlowLayout(FlowLayout.RIGHT,3,3));
 		
@@ -290,10 +295,11 @@ public class UserInterface extends JFrame{
 	 **************************************************************************/
 	private JMenuBar makeMenuBar(){
 		JMenuBar menuBar = new JMenuBar();
-		
+		//an array to minimize code, holds the Jmenu items
+		//calls a helpermethod setupJmenuBar to add them to the given
+		//menuBar
 		JMenu[] parentJmenuArr =  setupJmenuBar(new String[]{"File", "About", "Help"}, menuBar); // inline instatiation for array that will be accessed only once.
 		
-	
 		//usering multi demenional array with in-line array declaration to help with cleaner code
 		JMenuItem[][] menuItemsArr = setupSubMenuItems(
 				new String[][]{ 
@@ -302,19 +308,11 @@ public class UserInterface extends JFrame{
 						{"Get Help"} }
 				,parentJmenuArr );
 		
-	
-		//access by [col][rows]
-
-		
-		/*Top JmenuBar action listener section:
-		 * 	Notes: still needs development to "group" the listener to make code cleaner and clearer
-		 * 
-		 */
 		menuItemsArr[0][2].addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
+				//when submenu is asked to exit exit the ui gracfully
 				System.exit(-1);
 			}
 		});
@@ -335,8 +333,6 @@ public class UserInterface extends JFrame{
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				
 				//need to add or change the title of the pop up message!
 				JOptionPane.showMessageDialog(null, "Hello!"
 						+ "\nSo you've stumped on some problems with this?, howeverrrrrrr If your name is Reilly"
@@ -346,13 +342,6 @@ public class UserInterface extends JFrame{
 			}
 		});
 		
-
-		/*
-		 * End of Action Listeners for the Top JmenuBar
-		 */
-
-		//sets the Frames MenuBar
-		//setJMenuBar(menuBar);
 		return menuBar;
 	}
 	/**************************************************************************
@@ -369,17 +358,21 @@ public class UserInterface extends JFrame{
 	 * 	->
 	 * 	->
 	 **************************************************************************/
-	private JPanel makeBottomPanel(){
+	private JPanel makeBottomPanel(JTextField inputMessageField){
 		
 		//set bottom message text area
 		JPanel sendMessagePanel = new JPanel(new BorderLayout());
 		
 		JPanel textFramPanel = new JPanel(new GridLayout(1,1));
-		JTextField sendMsgField = new JTextField("Enter your message to send here");
-		JScrollPane scroll = new JScrollPane(sendMsgField);
+		
+		
+		//inputMessageField = new JTextField("Enter your message to send here");
+		
+		
+		JScrollPane scroll = new JScrollPane(inputMessageField);
 	
-		sendMsgField.setColumns(18); // sets a length fro this box
-		textFramPanel.add(sendMsgField);
+		inputMessageField.setColumns(18); // sets a length fro this box
+		textFramPanel.add(inputMessageField);
 
 		sendMessagePanel.add(textFramPanel, BorderLayout.LINE_START);
 		
@@ -399,26 +392,32 @@ public class UserInterface extends JFrame{
 		
 		sendMessagePanel.add(msgButtPanel, BorderLayout.LINE_END);
 
-		sendMsgField.setBorder(BorderFactory.createTitledBorder(
+		inputMessageField.setBorder(BorderFactory.createTitledBorder(
 				BorderFactory.createLoweredBevelBorder(),
 				"Input Messages here") );
-		
-		sendMsgField.addActionListener(new ActionListener() {
+		/*
+		inputMessageField.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				//each time an action has been performaed IE a enter
 				//we take the string that was used, send it to the server
 				//reset the field/clear the field
-				System.out.println("INFO: " + sendMsgField.getText());
+				System.out.println("INFO: " + inputMessageField.getText());
 				//UserInterface.sendMsgToTerminal(sendMsgField.getText());
-				sendMsgField.setText("");
+				sendMessageToIRC(inputMessageField.getText());
+				inputMessageField.setText("");
 			}
 		});
+		*/
 		
 		//getContentPane().add(sendMessagePanel, BorderLayout.PAGE_END);
 		return sendMessagePanel;
 		
+	}
+	
+	public JTextField getInputTextField(){
+		return this.inputMessageField;
 	}
 	/**************************************************************************
 	 * Function: 

@@ -15,7 +15,7 @@ public class IrcEngine {
 	private Socket socket;
 	private PrintStream streamToService;
 	private BufferedReader streamFromService;
-	private String defaultChannel = "kiwiirc-default";
+	private String currentChannel = "kiwiirc-default";
 
 	
 	public IrcEngine() throws IOException{
@@ -28,9 +28,12 @@ public class IrcEngine {
 		//connect to the interface
 		this.connect();
 		this.register();
-		this.joinChannel(defaultChannel);
+		this.joinChannel(currentChannel);
 	}
 	
+	public String getCurrentChannel(){
+		return this.currentChannel;
+	}
 	private void joinChannel(String channelName){
 		//do not include hashtage
 		String channelToJoin = channelName.replace("#","");
