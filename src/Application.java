@@ -4,9 +4,15 @@
  * 5/15/2017
  *  IRC Desktop Client
  * 
+ * Assumptions:
+ * 		-> User enters a valid Nickname
+ * 
+ * 
+ * 
  */
 
 import java.awt.BorderLayout;
+
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -46,26 +52,11 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListModel;
 import javax.swing.text.DefaultCaret;
-/*
- * NEW rework:
- * think of making a class called CHANNEL, CHANNEL WILL HAVE:
- * 	each channel Object will have a channel name, a out put and an input to that channel and from that channel,
- * application will make an instatiation of a Channel class and add that to our CHANNEL ARRAY when we push a button called "add channel'
- * we will try to put a start method in each channel so that when we grab the ojects in the array we can call start on them and each INDIVIDUAL thread will handle a Channel object,
- * EACH channel object thread will have its job of handling incoming and out going traffic, 
-
- * 
- * the MAIN base for our clients name will be in our APPLICATION class, which will pass a nickname and MAYBE a channel to the CHANNEL class
- */
 
 
+public class Application extends JFrame{
 
-
-public class Application extends JFrame{ // this entire class IS IS iS a JFrame, you do not need to instantiale another JFrame. DERPPP
-
-
-	//get Clients computer name, protected privacy
-	
+	//get the computer's name used for labeling the chat client
 	protected String clientComputerName = System.getProperty("user.name");
 
 	/*
@@ -87,13 +78,19 @@ public class Application extends JFrame{ // this entire class IS IS iS a JFrame,
 	//private IRCConnection IRCObject;
 	
 	private String channel;
-	
+	private String nickName;
 	
 	private String dir = System.getProperty("user.dir");
 	
 	
 	//private InputThread incomingMsg;
 	
+	/********************************************************************************************
+	 * Function: Default Constructor
+	 * Description: Used to construct the inintal desktop GUI
+	 * @throws UnknownHostException
+	 * @throws IOException
+	 ********************************************************************************************/
 	public Application() throws UnknownHostException, IOException{
 		adjustWindowProperties(); //just a helper method for cleaner code addjust the JFrames properties, and sets the layout
 		//IRC_Engine_Root = new IRC_Engine();//creates an instance of Channel;
@@ -102,11 +99,8 @@ public class Application extends JFrame{ // this entire class IS IS iS a JFrame,
 		
 		
 		this.channel = JOptionPane.showInputDialog("Please enter a channel to join");
-		
-		//this.IRCObject = new IRCConnection(this.channel);
-		
+		this.nickName = JOptionPane.showInputDialog("Please a unique Enter a Nickname");
 
-		
 		/*
 		public Application(IRCConnection IRCObject){
 			//set THIS Jframes title
@@ -136,7 +130,7 @@ public class Application extends JFrame{ // this entire class IS IS iS a JFrame,
 		 */
 		
 		
-		//created another Jpanel to be used as terminal Panel
+		//created another JPanel to be used as terminal Panel
 		JPanel terminalPanel = new JPanel();
 		
 
