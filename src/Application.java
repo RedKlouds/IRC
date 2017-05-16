@@ -1,4 +1,10 @@
-
+/*
+ * Danny Ly
+ * 
+ * 5/15/2017
+ *  IRC Desktop Client
+ * 
+ */
 
 import java.awt.BorderLayout;
 import java.awt.Desktop;
