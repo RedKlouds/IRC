@@ -56,6 +56,9 @@ public class IrcEngine {
 		//join the speicic chatroom
 		this.getStreamtoService().println("JOIN #" + channelToJoin);
 	}
+	public String getNickName(){
+		return this.nickName;
+	}
 	
 	private void register(){
 		System.out.printf("[+] Registering with NickName: %s%n", this.nickName);

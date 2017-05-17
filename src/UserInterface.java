@@ -138,7 +138,9 @@ public class UserInterface extends JFrame{
 		//set the layout manager for the terminal panel
 		terminalPanel.setLayout(new GridLayout());
 		//set the size of the terminal panel
-		terminalPanel.setSize(400,200); //set size of the terminal panel
+		//WidthXlength
+		terminalPanel.setSize(800,200); 
+		
 		//give the panel border
 		terminalPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLoweredBevelBorder(),"Terminal Channel Chat"));
 		//put a nice border around our terminal panel, and some title text
@@ -195,7 +197,7 @@ public class UserInterface extends JFrame{
 	 **************************************************************************/
 	private JPanel makeControlPanel(){
 		
-		JPanel rightPane = createAndSetJPanel(new BorderLayout(), 250, 240);
+		JPanel rightPane = createAndSetJPanel(new BorderLayout(), 120, 150);
 		//panel for the control panel
 		
 		JPanel controlPanel = createAndSetJPanel(new BorderLayout(), 250, 240);
@@ -208,7 +210,7 @@ public class UserInterface extends JFrame{
 		JPanel botLink = new JPanel(new FlowLayout(FlowLayout.RIGHT,3,3));
 		
 		JButton[] setButton = createCustomJButton(new ImageIcon[] {
-				new ImageIcon(dir + "\\test1.gif","Check out my GitHub!"),
+				new ImageIcon(dir + "\\RedKlouds.png","Check out my GitHub!"),
 				new ImageIcon(dir + "\\linkdin.png","want to connect? :D")
 				} , botLink);
 
@@ -645,7 +647,7 @@ public class UserInterface extends JFrame{
 	 * 	->
 	 **************************************************************************/
 	public void sendMsgToTerminal(String msg){
-		this.terminalDisp.append("Test: " + msg);
+		this.terminalDisp.append("\n" + msg);
 	}
 	public static void main(String[] args){
 		UserInterface ui = new UserInterface();
@@ -655,60 +657,5 @@ public class UserInterface extends JFrame{
 		
 	}
 }
-/*
-class Output extends Thread{
-	//output to the chat log
-	private BufferedReader br;
-	public Output(){
-		this(null);
-	}
-	public Output(BufferedReader s){
-		this.br = s;
-	}
-	public void run(){
-		String line;
-		try {
-			while((line = this.br.readLine()) != null){
-				System.out.println(line);
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-}
 
-
-
-class InputL extends Thread {
-	
-	Scanner scanner;
-	String readString;
-	String _channel_name;
-	PrintStream printS;
-	public InputL(PrintStream ps, String _channel_name){
-		this.scanner = new Scanner(System.in);
-		this.printS = ps;
-		this._channel_name = _channel_name;
-		
-	}
-	public void run(){
-		
-		readString = scanner.nextLine();
-		while(this.readString != null){
-			//given the input stream ,  then print to the stream
-			System.out.printf("[+] printing  message to the stream %s: ", readString);
-			printS.println("PRIVMSG " + " " + this._channel_name + " :" + readString);
-			//read from the input stream
-			//System.out.println(readString);
-			if(scanner.hasNextLine()){
-				readString = scanner.nextLine();
-			}else{
-				readString = null;
-				
-			}
-		}		
-	}
-}
-*/
 

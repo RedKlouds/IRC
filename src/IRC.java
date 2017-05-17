@@ -54,21 +54,28 @@ public class IRC {
 		bufferToTerminal = new Output(streamFromService, UI);
 		
 		inputMessageField = UI.getInputTextField();
-		this.start();
+		
+		this.init();
+		UI.sendMsgToTerminal("[+] Connected ...");
 		
 	}
 	
-	public void start(){
-		bufferToTerminal.start();
+	public void init(){
+		UI.sendMsgToTerminal("[+] Connecting .....");
 		inputMessageField.addActionListener(new ActionListener() {
 			//Method for out strea for when data is incoming from the client UI
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				streamToService.println("PRIVMSG " + "#kiwiirc-default" + " :" + inputMessageField.getText());
+				streamToService.println("PRIVMSG " + "#kiwiirc-default" +
+				" :" + inputMessageField.getText());
+				UI.sendMsgToTerminal(IRCEngine.getNickName() + " :" + inputMessageField.getText());
 				inputMessageField.setText("");
 			}
 		});
+		
+		bufferToTerminal.start();
+		
 	}
 	
 	public String getChannelName(){
@@ -79,7 +86,7 @@ public class IRC {
 	public static void main(String[] args){
 		IRC irc = new IRC();
 		
-		irc.start();
+		
 	}
 }
 
@@ -96,20 +103,35 @@ class Output extends Thread{
 	}
 	public void run(){
 		String line;
-		String pattern = ".*!";
+		String usrNamePattern = ":(.*)!";
+		String messagePattern = "PRIVMSG #.+ :(.*)";
+		String msg = "";
 		String usr ="";
+		String terminalOutput = "";
 		
 		try {
-			Pattern r = Pattern.compile(pattern);
+			Pattern usrPattern = Pattern.compile(usrNamePattern);
+			Pattern msgPattern = Pattern.compile(messagePattern);
 			while((line = this.br.readLine()) != null){
-				Matcher matcher = r.matcher(line);
-				if(matcher.find()){
-					usr = matcher.group();
-					System.out.println(usr);
+				if(line.contains("PRIVMSG")){
+					Matcher matcher_usr = usrPattern.matcher(line);
+					Matcher matcher_msg = msgPattern.matcher(line);
+					if(matcher_usr.find()){
+						usr = matcher_usr.group();
+						//System.out.println("USER: " + usr);
+					}
+					if(matcher_msg.find()){
+						//if message if found for regex
+						msg = matcher_msg.group();
+						//System.out.println("MESSAGE: " + matcher_msg.groupCount());
+					}
+					terminalOutput = usr + " : " + msg;
+					ui.sendMsgToTerminal(terminalOutput);
+					
+					//ui.sendMsgToTerminal(line);
+					//ui.sendMsgToTerminal(usr);
+					
 				}
-				
-				ui.sendMsgToTerminal(line);
-				ui.sendMsgToTerminal(usr);
 				System.out.println(line);
 			}
 		} catch (IOException e) {
