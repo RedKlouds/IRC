@@ -30,5 +30,8 @@ Through this project, I'm glad to have done such a project because it's laid the
 8. Jscroll pane on both Terminal windows for better visibility
 9. custom links to GitHub and Linkedin
 Here is a screen shot if intrested.
-![alt tag](http://s17.postimg.org/zc2jif3y7/Screen_Shot.png)
+![alt tag](http://i.imgur.com/VCdILCk.jpg)
+![alt tag](http://i.imgur.com/aalzRcQ.jpg)
+![alt tag](http://i.imgur.com/ijTVmdm.jpg)
+run jar file to test it!
 # IRC
