@@ -1,7 +1,7 @@
 /******************************************************************************
  * Author: Danny Ly
  * Date Created: 3/15/2015
- * Changelog : Please View github repository
+ * Changlog : Please View github repository
  * 
  * 
  * Program Description:
@@ -14,36 +14,49 @@
  * -> This program works by mainly having two gateways to the interface.
  * 
  * POSTCONDITIONS:
- * 		->
+ * 		-> None
  * -> Assumptions: 
  * 		->User enter a valid unique ID, that has not taken.
+ * POSTCONDIITON:
+ * 	->initialization of a desktop client to use , you will be able
+ * to chat through this desktop client.
  */
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Scanner;
-import java.util.regex.Pattern;
-
 import javax.swing.JTextField;
 
-import java.util.regex.Matcher;
+
 
 public class IRC {
 	private UserInterface UI;
 	private IrcEngine IRCEngine;
 	private PrintStream streamToService;
 	private BufferedReader streamFromService;
-	private Output bufferToTerminal; //buffer to send information to
+	private ChannelThread bufferToTerminal; //buffer to send information to
 	private JTextField inputMessageField;
 	
-	//Userinterface
+	 /**************************************************************************
+	 * Function: Default Constructor
+	 *  
+	 * Description:
+	 * 	->
+	 * ASSUMPTIONS:
+	 * 	-> Singleton initialize only a single instance of this object
+	 * PRECONDITIONS:
+	 * 	-> Successful initialize of UserInterface object
+	 * POSTCONDITIONS:
+	 * 	-> UserInterface is initialize
+	 * 	-> IRC Server socket is initialize
+	 * 	-> communications between user input action listiseners and JTextArea
+	 * for text appending(input).
+	 **************************************************************************/
 	public IRC(){
 		//set up the userInterface Object
-		UI = new UserInterface();
 		
-	
+		UI = UserInterface.getInstance();
 		IRCEngine = IrcEngine.getInstance();
 		//IRCEngine = new IrcEngine();
 		streamToService = IRCEngine.getStreamtoService();
@@ -51,7 +64,7 @@ public class IRC {
 
 		//set the irc object to the interface so it can speak with it
 		
-		bufferToTerminal = new Output(streamFromService, UI);
+		bufferToTerminal = new ChannelThread(streamFromService, UI);
 		
 		inputMessageField = UI.getInputTextField();
 		
@@ -59,7 +72,23 @@ public class IRC {
 		UI.sendMsgToTerminal("[+] Connected ...");
 		
 	}
-	
+	/**************************************************************************
+	 * Function: init
+	 *  
+	 * Description:
+	 * 	-> initialize the IRC object(driver) by setting up listeners for keypress
+	 * for the User interface, so we can have input to send to the service
+	 * 	-> also clears the text after text input
+	 * ASSUMPTIONS:
+	 * 	-> BufferReader has been correctly initialized to accept input from service 
+	 * PRECONDITIONS:
+	 * 	-> proper initialization of Buffer reader
+	 * 	-> None
+	 * POSTCONDITIONS:
+	 * 	-> Calls run from the parent thread class to start concurrent reads of
+	 * data from the webservice
+	 * 	->
+	 **************************************************************************/
 	public void init(){
 		UI.sendMsgToTerminal("[+] Connecting .....");
 		inputMessageField.addActionListener(new ActionListener() {
@@ -77,96 +106,26 @@ public class IRC {
 		bufferToTerminal.start();
 		
 	}
-	
+	/**************************************************************************
+	 * Function:  getChannel Name
+	 *  
+	 * Description:
+	 * 	-> Returns the current channels name
+	 * ASSUMPTIONS:
+	 * 	-> IRC Engine Has been correctly initialized
+	 * PRECONDITIONS:
+	 * 	-> None
+	 * 	-> None
+	 * POSTCONDITIONS:
+	 * 	-> Returns a String pertaining to the current Channel Name
+	 * 	->
+	 **************************************************************************/
 	public String getChannelName(){
 		return this.IRCEngine.getCurrentChannel();
 	}
-	//get the output stream,
-	//push the things in output stream to the display
+	
 	public static void main(String[] args){
 		IRC irc = new IRC();
-		
-		
 	}
 }
 
-
-
-
-class Output extends Thread{
-	private BufferedReader br;
-	UserInterface ui;
-	public Output(){}
-	public Output(BufferedReader s, UserInterface ui){
-		this.br = s;
-		this.ui = ui;
-	}
-	public void run(){
-		String line;
-		String usrNamePattern = ":(.*)!";
-		String messagePattern = "PRIVMSG #.+ :(.*)";
-		String msg = "";
-		String usr ="";
-		String terminalOutput = "";
-		
-		try {
-			Pattern usrPattern = Pattern.compile(usrNamePattern);
-			Pattern msgPattern = Pattern.compile(messagePattern);
-			while((line = this.br.readLine()) != null){
-				if(line.contains("PRIVMSG")){
-					Matcher matcher_usr = usrPattern.matcher(line);
-					Matcher matcher_msg = msgPattern.matcher(line);
-					if(matcher_usr.find()){
-						usr = matcher_usr.group();
-						//System.out.println("USER: " + usr);
-					}
-					if(matcher_msg.find()){
-						//if message if found for regex
-						msg = matcher_msg.group();
-						//System.out.println("MESSAGE: " + matcher_msg.groupCount());
-					}
-					terminalOutput = usr + " : " + msg;
-					ui.sendMsgToTerminal(terminalOutput);
-					
-					//ui.sendMsgToTerminal(line);
-					//ui.sendMsgToTerminal(usr);
-					
-				}
-				System.out.println(line);
-			}
-		} catch (IOException e) {
-			
-			e.printStackTrace();
-		}
-	}
-}
-class InputL extends Thread {
-	
-	Scanner scanner;
-	String readString;
-	String _channel_name;
-	PrintStream printS;
-	public InputL(PrintStream ps, String _channel_name){
-		this.scanner = new Scanner(System.in);
-		this.printS = ps;
-		this._channel_name = _channel_name;
-		
-	}
-	public void run(){
-		
-		readString = scanner.nextLine();
-		while(this.readString != null){
-			//given the input stream ,  then print to the stream
-			System.out.printf("[+] printing  message to the stream %s: ", readString);
-			printS.println("PRIVMSG " + " " + this._channel_name + " :" + readString);
-			//read from the input stream
-			//System.out.println(readString);
-			if(scanner.hasNextLine()){
-				readString = scanner.nextLine();
-			}else{
-				readString = null;
-				
-			}
-		}		
-	}
-}

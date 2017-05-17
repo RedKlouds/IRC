@@ -47,13 +47,21 @@ import javax.swing.JTextField;
 import javax.swing.ListModel;
 import javax.swing.text.DefaultCaret;
 /**************************************************************
+ *	Danny Ly
+ *
  * This class is used to handle population of the User interface
  * There will  be methods however to allow interfacing with the 
  * panels inorder to display text to them
  * 
- * Problems:
- * 	make sure nick name checking
- * 	JScrollPanel needs to find soluton to scroll back up freely
+ * Class Description:
+ * 	-> This class handles populating the User interface where
+ * it will also have one inlet and 1 outlet, the inlet allows
+ * for text to come into the user interface and dispay on the 
+ * the terminal window.
+ * 	-> The outlet will allow for data to flow from the input to
+ * the associated web service, I've tried to design this as 
+ * Modulated as possible, such that it is free to allow incoming
+ * as well as outgoing text to sources.
  * 
  * 
  ***************************************************************/
@@ -74,8 +82,26 @@ public class UserInterface extends JFrame{
 	//used asthetic to show computer name at top of UI client
 	private String dir = System.getProperty("user.dir");
 	
-	protected UserInterface(){
-		//instatiate the main outup tot he user interface
+	
+	/**************************************************************************
+	 * Function: Default constructor
+
+	 * Description:
+	 * 	-> Private default constructor intentially done to, prevent instantiation
+	 * of more than one type of this object, this is done through a technique 
+	 * known as singleton
+	 * ASSUMPTIONS:
+	 * 	-> None
+	 * PRECONDITIONS:
+	 * 	-> User calles getInstance instead of trying to construct the object
+	 * 	-> None
+	 * POSTCONDITIONS:
+	 * 	-> sets up the contentPane size and populates all panels onto the main
+	 * content pane
+	 * 	-> None
+	 **************************************************************************/
+	private UserInterface(){
+		
 		terminalDisp = new JTextArea();
 		inputMessageField = new JTextField("Enter your message to send here");
 		//set up this window properties
@@ -103,6 +129,24 @@ public class UserInterface extends JFrame{
 		setVisible(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
+	/**************************************************************************
+	 * Function: GetInstance
+	 *  
+	 * Description:
+	 * 	-> Entry point for the Object to get made only once, this method ensure 
+	 * it is thread safe by making this method synchonized, although we can also 
+	 * make this more optimized by adding 'double checking, by making just the 
+	 *one method a synchonized instead of the entire function, i choosen not to
+	 *because this method is so lightweight. 
+	 * ASSUMPTIONS:
+	 * 	-> None
+	 * PRECONDITIONS:
+	 * 	-> None
+	 * 	-> None
+	 * POSTCONDITIONS:
+	 * 	->Returns an instance of UserInterface to the caller.
+	 * 	->
+	 **************************************************************************/
 	public synchronized static UserInterface getInstance(){
 		//inorder to make sure that the object is thread safe we need
 		//to synchonize the getInstance method, 
@@ -113,6 +157,7 @@ public class UserInterface extends JFrame{
 			//prevent to instantiate more than just the one
 			_userinterface = new UserInterface();
 		}
+		//return the single reference to this object
 		return _userinterface;
 	}
 	
@@ -139,15 +184,10 @@ public class UserInterface extends JFrame{
 		terminalPanel.setLayout(new GridLayout());
 		//set the size of the terminal panel
 		//WidthXlength
-		terminalPanel.setSize(800,200); 
-		
+		terminalPanel.setSize(800,200); 		
 		//give the panel border
 		terminalPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLoweredBevelBorder(),"Terminal Channel Chat"));
 		//put a nice border around our terminal panel, and some title text
-		
-		//terminalMsgDisplay = new JTextArea();
-		//new InputThread(this.IRCObject, terminalMsgDisplay).start(); //made a thread here and attached it to the textArea to output
-		
 		DefaultCaret caret = (DefaultCaret)terminalMsgDisplay.getCaret();
 		//auto scroll policy needs to make changes
 		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
@@ -285,17 +325,19 @@ public class UserInterface extends JFrame{
 	
 	
 	/**************************************************************************
-	 * Function: 
+	 * Function: makeMenuBar
 	 *  
 	 * Description:
-	 * 	->
+	 * 	-> makes the menu bar at the top of the UI, and adds action listeners
+	 * to each one of them
 	 * ASSUMPTIONS:
 	 * 	-> None
 	 * PRECONDITIONS:
 	 * 	-> None
 	 * 	-> None
 	 * POSTCONDITIONS:
-	 * 	->
+	 * 	-> Menu bar as been populated and returned to the caller to be 
+	 * added into the content pane
 	 * 	->
 	 **************************************************************************/
 	private JMenuBar makeMenuBar(){
@@ -350,17 +392,19 @@ public class UserInterface extends JFrame{
 		return menuBar;
 	}
 	/**************************************************************************
-	 * Function: 
+	 * Function: makeBottom Panel 
 	 *  
 	 * Description:
-	 * 	->
+	 * 	-> This function is in charge of creating the user input bar at the 
+	 * bottom of the User interface, which include an text fiel and a button
+	 * to clear the main terminal text
 	 * ASSUMPTIONS:
 	 * 	-> None
 	 * PRECONDITIONS:
 	 * 	-> None
 	 * 	-> None
 	 * POSTCONDITIONS:
-	 * 	->
+	 * 	-> returns the pane with input and text clear button
 	 * 	->
 	 **************************************************************************/
 	private JPanel makeBottomPanel(JTextField inputMessageField){
@@ -370,13 +414,9 @@ public class UserInterface extends JFrame{
 		
 		JPanel textFramPanel = new JPanel(new GridLayout(1,1));
 		
-		
-		//inputMessageField = new JTextField("Enter your message to send here");
-		
-		
 		JScrollPane scroll = new JScrollPane(inputMessageField);
 	
-		inputMessageField.setColumns(18); // sets a length fro this box
+		inputMessageField.setColumns(18); // sets a length for this box
 		textFramPanel.add(inputMessageField);
 
 		sendMessagePanel.add(textFramPanel, BorderLayout.LINE_START);
@@ -400,23 +440,8 @@ public class UserInterface extends JFrame{
 		inputMessageField.setBorder(BorderFactory.createTitledBorder(
 				BorderFactory.createLoweredBevelBorder(),
 				"Input Messages here") );
-		/*
-		inputMessageField.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				//each time an action has been performaed IE a enter
-				//we take the string that was used, send it to the server
-				//reset the field/clear the field
-				System.out.println("INFO: " + inputMessageField.getText());
-				//UserInterface.sendMsgToTerminal(sendMsgField.getText());
-				sendMessageToIRC(inputMessageField.getText());
-				inputMessageField.setText("");
-			}
-		});
-		*/
-		
-		//getContentPane().add(sendMessagePanel, BorderLayout.PAGE_END);
+
+
 		return sendMessagePanel;
 		
 	}
@@ -467,17 +492,18 @@ public class UserInterface extends JFrame{
 		return retArr;
 	}
 	/**************************************************************************
-	 * Function: 
+	 * Function:  Helper function 
 	 *  
 	 * Description:
-	 * 	->
+	 * 	-> Given an array of label names and a panel, craete the buttons in order
+	 * and populate them onto the panel that was given
 	 * ASSUMPTIONS:
 	 * 	-> None
 	 * PRECONDITIONS:
 	 * 	-> None
 	 * 	-> None
 	 * POSTCONDITIONS:
-	 * 	->
+	 * 	-> return the panel of button that have been populated
 	 * 	->
 	 **************************************************************************/
 	private JButton[] setLabelOnButton(String[] labelNames, JPanel addToPanel){
@@ -501,7 +527,7 @@ public class UserInterface extends JFrame{
 		
 	}
 	/**************************************************************************
-	 * Function: 
+	 * Function: Helperfunction to set the JPanel
 	 *  
 	 * Description:
 	 * 	->
@@ -565,7 +591,9 @@ public class UserInterface extends JFrame{
 	 * Function: 
 	 *  
 	 * Description:
-	 * 	->
+	 * 	-> * this method was designed to take in a 2D array of string of menuItem names and associated Jemnu for them to be added,
+		 * this method will create a JmenuItem and add them to the given Jmenu component
+		 * returns a 2D JMenuItem array to access each JmenuItem and add action listeners or work with them.
 	 * ASSUMPTIONS:
 	 * 	-> None
 	 * PRECONDITIONS:
@@ -579,76 +607,70 @@ public class UserInterface extends JFrame{
 
 		panel.setBorder(BorderFactory.createTitledBorder(
 				BorderFactory.createLoweredBevelBorder(),
-				title) );
-		
+				title)
+				);
 	}
 
 
 	private JMenuItem[][] setupSubMenuItems(String[][] menuItemNames, JMenu[] Jmenu  ){
-		/*
-		 * this method was designed to take in a 2D array of string of menuItem names and associated Jemnu for them to be added,
-		 * this method will create a JmenuItem and add them to the given Jmenu component
-		 * returns a 2D JMenuItem array to access each JmenuItem and add action listenrs or work with them.
-		 * 	Notes:
-		 * 		-- Currently impolemented:
-		 * 			- each Menu has a Nemonic keyeven which allows keypress to activate that menu given its first character
-		 * 			- implemented a "method" to add a seperator, by using the 'Hash#' symbol after a string to signal a seperator
-		 * 			
-		 */
 		
-		int MAX_NUM_OF_ITEM = 10; // this number because in a dimentoon array it is [colums][rows] we cannot predetermine how many rows(menu items there will be)
-		
-		// however we can determine how many colums there will be , this is where theis MAX num comes from so we set a standard DO NOT EXCEED marker.
-		
+		int MAX_NUM_OF_ITEM = 10; // this number because in a 
+		//dimentoon array it is [colums][rows] we cannot predetermine how many rows(menu items there will be)
+		// however we can determine how many colums there will be , this is where theis MAX 
+		//num comes from so we set a standard DO NOT EXCEED marker.		
 		
 		String tempNames; // optimize code so its more we only need to init this variable once to reuse.
 	
-		if(Jmenu.length != menuItemNames.length) { throw new RuntimeException("Sizes are not right!"); }; // throws if the colums do not match up with the amount of menu parent labels
+		if(Jmenu.length != menuItemNames.length) { 
+			throw new RuntimeException("Sizes are not right!"); 
+		}; // throws if the colums do not match up with the amount of menu parent labels
 		
-		JMenuItem[][] retArr = new JMenuItem[Jmenu.length][MAX_NUM_OF_ITEM]; // instatiates a empty 2D array to be returned with correct [columns][ MAX NUM OF ITEMS]
+		JMenuItem[][] retArr = new JMenuItem[Jmenu.length][MAX_NUM_OF_ITEM]; 
+		// instatiates a empty 2D array to be returned with correct [columns][ MAX NUM OF ITEMS]
 
-		for(int column = 0; column < menuItemNames.length ; column++ ){ // acces the column
+		for(int column = 0; column < menuItemNames.length ; column++ ){ 
+			// access the column
 			
-			for(int row = 0; row < menuItemNames[column].length ; row ++){ // acces the rows of that colnm
+			for(int row = 0; row < menuItemNames[column].length ; row ++){
+				// access the rows of that column
 				
 				tempNames = menuItemNames[column][row]; // uses this variable once
 				
-				retArr[column][row] = new JMenuItem(tempNames.replace("#", "")); // removes the symbol before adding the menuItem to the Jbar		
-				retArr[column][row].setMnemonic(tempNames.charAt(0)); // adds a nmonic for that menuitem
+				retArr[column][row] = new JMenuItem(tempNames.replace("#", ""));
+				// removes the symbol before adding the menuItem to the Jbar		
+				retArr[column][row].setMnemonic(tempNames.charAt(0)); 
+				// adds a nmonic for that menuItem
 				
 				Jmenu[column].add(retArr[column][row]); // add's the modified menuitem to the Jmenu
 				
 				if(tempNames.contains("#")){ // self defined symbol to add a seperator to the menu after this name
-					
-					
-					
-					Jmenu[column].addSeparator();// adds a seperator
-					
+
+					Jmenu[column].addSeparator();// adds a seperator					
 				}	
 				
 			}
-			
+		
 		}
-
 		return retArr; // returns the 2D modified array to work with .
 	}
 	/**************************************************************************
-	 * Function: MAIN TESTING Of this sub module
+	 * Function: Helper method send message to terminalk
 	 *  
 	 * Description:
-	 * 	->
+	 * 	-> This method takes input and appends it to the terminal screen
 	 * ASSUMPTIONS:
 	 * 	-> None
 	 * PRECONDITIONS:
 	 * 	-> None
 	 * 	-> None
 	 * POSTCONDITIONS:
-	 * 	->
+	 * 	-> text is appended to the terminal panel of the user interface
 	 * 	->
 	 **************************************************************************/
 	public void sendMsgToTerminal(String msg){
 		this.terminalDisp.append("\n" + msg);
 	}
+	
 	public static void main(String[] args){
 		UserInterface ui = new UserInterface();
 		for(int i =0; i <500; i++){
