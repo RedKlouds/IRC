@@ -43,16 +43,12 @@ public class IRC {
 		//set up the userInterface Object
 		UI = new UserInterface();
 		
-		try{
-			IRCEngine = new IrcEngine();
-			streamToService = IRCEngine.getStreamtoService();
-			streamFromService = IRCEngine.getStreamFromService();
-			
-		}catch (IOException e){
-			//error
-			System.out.println("ERROR during instaliation of "
-					+ "IRC ENgine: " + e);
-		}
+	
+		IRCEngine = IrcEngine.getInstance();
+		//IRCEngine = new IrcEngine();
+		streamToService = IRCEngine.getStreamtoService();
+		streamFromService = IRCEngine.getStreamFromService();
+
 		//set the irc object to the interface so it can speak with it
 		
 		bufferToTerminal = new Output(streamFromService, UI);

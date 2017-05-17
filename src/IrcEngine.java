@@ -17,8 +17,10 @@ public class IrcEngine {
 	private BufferedReader streamFromService;
 	private String currentChannel = "kiwiirc-default";
 
+	private static IrcEngine _ircEngine = null;
 	
-	public IrcEngine() throws IOException{
+	
+	private IrcEngine() throws IOException{
 		//get the nick name, also checks for non numm alpha input
 		this.nickNamePrompt();
 		this.host = "irc.freenode.net";
@@ -29,6 +31,20 @@ public class IrcEngine {
 		this.connect();
 		this.register();
 		this.joinChannel(currentChannel);
+	}
+	
+	public synchronized static IrcEngine getInstance(){
+		if(_ircEngine == null){
+			try {
+				_ircEngine = new IrcEngine();
+			} catch (IOException e) {
+				System.out.println(
+						"ERROR during instaliation of "
+						+ "IRC ENgine: " + e);
+				e.printStackTrace();
+			}
+		}
+		return _ircEngine;
 	}
 	
 	public String getCurrentChannel(){

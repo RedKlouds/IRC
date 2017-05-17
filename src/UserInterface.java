@@ -103,7 +103,10 @@ public class UserInterface extends JFrame{
 		setVisible(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
-	public static UserInterface getInstance(){
+	public synchronized static UserInterface getInstance(){
+		//inorder to make sure that the object is thread safe we need
+		//to synchonize the getInstance method, 
+		//Synchonize as in one call after another.
 		//place where the object will be returned, and only one 
 		//will exising because of the following code
 		if(_userinterface == null){
