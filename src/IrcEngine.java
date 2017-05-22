@@ -20,18 +20,16 @@ public class IrcEngine {
 	private static IrcEngine _ircEngine = null;
 	
 	/**************************************************************************
-	 * Function: 
-	 *  
+	 * Function: Default Constructor
 	 * Description:
-	 * 	->
+	 * 	-> Sets up the IRC connection to the webservice
 	 * ASSUMPTIONS:
-	 * 	-> None
+	 * 	-> Nickname is unique and not taken
 	 * PRECONDITIONS:
 	 * 	-> None
-	 * 	-> None
 	 * POSTCONDITIONS:
-	 * 	->
-	 * 	->
+	 * 	-> Joins the defailt channel
+	 * 	-> Connects to the webservice(socket)
 	 **************************************************************************/
 	private IrcEngine() throws IOException{
 		//get the nick name, also checks for non numm alpha input
@@ -46,18 +44,20 @@ public class IrcEngine {
 		this.joinChannel(currentChannel);
 	}
 	/**************************************************************************
-	 * Function: 
-	 *  
+	 * Function: getInstance (singleton method)
 	 * Description:
-	 * 	->
+	 * 	-> get's a single instance of the class through this method
+	 *	-> synchronized allows this entire function to be thread safe,
+	 *	By giving it synchonized read/write,
+	 *	-> optimizations could be to synchonize not the entire function 
+	 *	but just what is is needing synchronized. 
 	 * ASSUMPTIONS:
 	 * 	-> None
 	 * PRECONDITIONS:
 	 * 	-> None
 	 * 	-> None
 	 * POSTCONDITIONS:
-	 * 	->
-	 * 	->
+	 * 	-> returns a single instance of IRCEngine class
 	 **************************************************************************/
 	public synchronized static IrcEngine getInstance(){
 		if(_ircEngine == null){
