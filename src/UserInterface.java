@@ -250,11 +250,13 @@ public class UserInterface extends JFrame{
 		JPanel botLink = new JPanel(new FlowLayout(FlowLayout.RIGHT,3,3));
 		
 		JButton[] setButton = createCustomJButton(new ImageIcon[] {
-				new ImageIcon(dir + "\\RedKlouds.png","Check out my GitHub!"),
-				new ImageIcon(dir + "\\linkdin.png","want to connect? :D")
+				new ImageIcon(dir + "\\images\\github_black.gif", "github"),
+				new ImageIcon(dir + "\\images\\RedKlouds.png","Website"),
+				new ImageIcon(dir + "\\images\\linkdin.png","want to connect? :D")
 				} , botLink);
 
-		
+
+
 		setButton[0].addActionListener(new ActionListener() {
 			
 			@Override
@@ -268,8 +270,20 @@ public class UserInterface extends JFrame{
 			}
 		});
 		
-		
 		setButton[1].addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try{
+					Desktop.getDesktop().browse(new URI("http://www.lydanny.com"));
+				}catch(Exception qq){
+					qq.printStackTrace();
+				}
+			}
+		});
+		
+		
+		setButton[2].addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
