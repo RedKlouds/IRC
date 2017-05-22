@@ -6,6 +6,9 @@ tmp/
 *.bak
 *.swp
 *~.nib
+*.war
+*.ear
+*.class
 local.properties
 .settings/
 .loadpath
